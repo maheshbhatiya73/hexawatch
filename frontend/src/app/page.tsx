@@ -217,8 +217,6 @@ export default function Dashboard() {
             </div>
           </motion.div>
         </motion.div>
-
-        {/* Processes Section */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
@@ -249,8 +247,6 @@ export default function Dashboard() {
             ))}
           </div>
         </motion.div>
-
-        {/* Logs Section */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
