@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HexaWatch - Advanced System Monitor</title>
+    <title>HexaWatch - Advanced Dashboard</title>
     <style>
         * {
             margin: 0;
@@ -12,22 +12,89 @@
             font-family: 'Segoe UI', Arial, sans-serif;
         }
         body {
+            line-height: 1.6;
+            transition: background 0.3s, color 0.3s;
+        }
+        /* Dark Theme (Default) */
+        body.dark {
             background: #1a1a2e;
             color: #e0e0e0;
-            line-height: 1.6;
-            padding: 20px;
+        }
+        .sidebar.dark, .header.dark, .card.dark, .chart-container.dark, .logs.dark, .processes.dark {
+            background: #16213e;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        /* Light Theme */
+        body.light {
+            background: #f0f2f5;
+            color: #333;
+        }
+        .sidebar.light, .header.light, .card.light, .chart-container.light, .logs.light, .processes.light {
+            background: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            padding: 20px;
+            position: fixed;
+            height: 100%;
+            border-radius: 0 10px 10px 0;
+            transition: background 0.3s;
+        }
+        .sidebar h2 {
+            color: #00d4ff;
+            margin-bottom: 30px;
+            font-size: 1.8em;
+        }
+        .sidebar ul {
+            list-style: none;
+        }
+        .sidebar ul li {
+            margin: 20px 0;
+        }
+        .sidebar ul li a {
+            color: inherit;
+            text-decoration: none;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background 0.2s;
+        }
+        .sidebar ul li a:hover {
+            background: rgba(0, 212, 255, 0.1);
+        }
+        .sidebar .theme-toggle {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: #00d4ff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .sidebar .theme-toggle:hover {
+            background: #00aaff;
+        }
+        .main-content {
+            margin-left: 250px;
+            flex: 1;
+            padding: 20px;
         }
         .header {
             text-align: center;
             margin-bottom: 30px;
             padding: 20px;
-            background: #16213e;
             border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: background 0.3s;
         }
         .header h1 {
             font-size: 2.5em;
@@ -40,11 +107,9 @@
             margin-bottom: 20px;
         }
         .card {
-            background: #16213e;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            transition: transform 0.2s;
+            transition: transform 0.2s, background 0.3s;
         }
         .card:hover {
             transform: translateY(-5px);
@@ -56,7 +121,6 @@
         }
         .card p {
             font-size: 1.8em;
-            color: #fff;
         }
         .charts {
             display: grid;
@@ -65,17 +129,15 @@
             margin-bottom: 20px;
         }
         .chart-container {
-            background: #16213e;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: background 0.3s;
         }
         .logs, .processes {
-            background: #16213e;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
             margin-bottom: 20px;
+            transition: background 0.3s;
         }
         .logs h2, .processes h2 {
             color: #00d4ff;
@@ -85,20 +147,18 @@
             max-height: 200px;
             overflow-y: auto;
             font-size: 0.9em;
-            color: #b0b0b0;
         }
         #process-table {
             width: 100%;
             border-collapse: collapse;
-            color: #e0e0e0;
         }
         #process-table th, #process-table td {
             padding: 10px;
             text-align: left;
-            border-bottom: 1px solid #2a2a4e;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
         }
         #process-table th {
-            background: #0f172a;
+            background: rgba(0, 212, 255, 0.1);
             color: #00d4ff;
         }
         .kill-btn {
@@ -115,65 +175,90 @@
         }
     </style>
 </head>
-<body>
+<body class="dark">
     <div class="container">
-        <div class="header">
-            <h1>HexaWatch - Advanced System Monitor</h1>
+        <!-- Sidebar -->
+        <div class="sidebar dark">
+            <h2>HexaWatch</h2>
+            <ul>
+                <li><a href="#" onclick="showSection('dashboard')">🏠 Dashboard</a></li>
+                <li><a href="#" onclick="showSection('charts')">📊 Charts</a></li>
+                <li><a href="#" onclick="showSection('processes')">⚙️ Processes</a></li>
+                <li><a href="#" onclick="showSection('logs')">📜 Logs</a></li>
+                <li><a href="#">🔧 Settings</a></li>
+                <li><a href="#">ℹ️ About</a></li>
+            </ul>
+            <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
         </div>
 
-        <!-- System Stats -->
-        <div class="dashboard">
-            <div class="card">
-                <h2>CPU Usage</h2>
-                <p id="cpu">0%</p>
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header dark">
+                <h1>HexaWatch - Advanced Dashboard</h1>
             </div>
-            <div class="card">
-                <h2>RAM Usage</h2>
-                <p id="ram">0% (0 MB)</p>
-            </div>
-            <div class="card">
-                <h2>Total RAM</h2>
-                <p id="total-ram">0 MB</p>
-            </div>
-            <div class="card">
-                <h2>Free RAM</h2>
-                <p id="free-ram">0 MB</p>
-            </div>
-        </div>
 
-        <!-- Charts -->
-        <div class="charts">
-            <div class="chart-container">
-                <h2>CPU Usage Trend</h2>
-                <canvas id="cpuChart"></canvas>
+            <!-- Dashboard Section -->
+            <div id="dashboard-section" class="section">
+                <div class="dashboard">
+                    <div class="card dark">
+                        <h2>CPU Usage</h2>
+                        <p id="cpu">0%</p>
+                    </div>
+                    <div class="card dark">
+                        <h2>RAM Usage</h2>
+                        <p id="ram">0% (0 MB)</p>
+                    </div>
+                    <div class="card dark">
+                        <h2>Total RAM</h2>
+                        <p id="total-ram">0 MB</p>
+                    </div>
+                    <div class="card dark">
+                        <h2>Free RAM</h2>
+                        <p id="free-ram">0 MB</p>
+                    </div>
+                </div>
             </div>
-            <div class="chart-container">
-                <h2>RAM Usage Trend</h2>
-                <canvas id="ramChart"></canvas>
+
+            <!-- Charts Section -->
+            <div id="charts-section" class="section" style="display: none;">
+                <div class="charts">
+                    <div class="chart-container dark">
+                        <h2>CPU Usage Trend</h2>
+                        <canvas id="cpuChart"></canvas>
+                    </div>
+                    <div class="chart-container dark">
+                        <h2>RAM Usage Trend</h2>
+                        <canvas id="ramChart"></canvas>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <!-- Logs -->
-        <div class="logs">
-            <h2>Application Logs</h2>
-            <div id="log-list"></div>
-        </div>
+            <!-- Processes Section -->
+            <div id="processes-section" class="section" style="display: none;">
+                <div class="processes dark">
+                    <h2>Running Processes</h2>
+                    <table id="process-table">
+                        <thead>
+                            <tr>
+                                <th>PID</th>
+                                <th>Name</th>
+                                <th>CPU %</th>
+                                <th>Memory</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="process-list"></tbody>
+                    </table>
+                </div>
+            </div>
 
-        <!-- Processes -->
-        <div class="processes">
-            <h2>Running Processes</h2>
-            <table id="process-table">
-                <thead>
-                    <tr>
-                        <th>PID</th>
-                        <th>Name</th>
-                        <th>CPU %</th>
-                        <th>Memory</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="process-list"></tbody>
-            </table>
+            <!-- Logs Section -->
+            <div id="logs-section" class="section" style="display: none;">
+                <div class="logs dark">
+                    <h2>Application Logs</h2>
+                    <div id="log-list"></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -225,8 +310,6 @@
         // Stats Handling
         statsWs.onmessage = function(event) {
             const data = JSON.parse(event.data);
-            
-            // Update Stats
             document.getElementById('cpu').textContent = data.cpu.toFixed(2) + '%';
             const usedMB = (data.used_ram / 1024 / 1024).toFixed(2);
             const totalMB = (data.total_ram / 1024 / 1024).toFixed(2);
@@ -235,7 +318,6 @@
             document.getElementById('total-ram').textContent = totalMB + ' MB';
             document.getElementById('free-ram').textContent = freeMB + ' MB';
 
-            // Update Charts
             const time = new Date().toLocaleTimeString();
             cpuChart.data.labels.push(time);
             cpuChart.data.datasets[0].data.push(data.cpu);
@@ -289,11 +371,73 @@
             });
         }
 
+        // Section Navigation
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.style.display = 'none';
+            });
+            document.getElementById(sectionId + '-section').style.display = 'block';
+        }
+
+        // Theme Toggle
+        function toggleTheme() {
+            const body = document.body;
+            const sidebar = document.querySelector('.sidebar');
+            const header = document.querySelector('.header');
+            const cards = document.querySelectorAll('.card');
+            const chartContainers = document.querySelectorAll('.chart-container');
+            const logs = document.querySelector('.logs');
+            const processes = document.querySelector('.processes');
+
+            if (body.classList.contains('dark')) {
+                body.classList.remove('dark');
+                body.classList.add('light');
+                sidebar.classList.remove('dark');
+                sidebar.classList.add('light');
+                header.classList.remove('dark');
+                header.classList.add('light');
+                cards.forEach(card => {
+                    card.classList.remove('dark');
+                    card.classList.add('light');
+                });
+                chartContainers.forEach(chart => {
+                    chart.classList.remove('dark');
+                    chart.classList.add('light');
+                });
+                logs.classList.remove('dark');
+                logs.classList.add('light');
+                processes.classList.remove('dark');
+                processes.classList.add('light');
+            } else {
+                body.classList.remove('light');
+                body.classList.add('dark');
+                sidebar.classList.remove('light');
+                sidebar.classList.add('dark');
+                header.classList.remove('light');
+                header.classList.add('dark');
+                cards.forEach(card => {
+                    card.classList.remove('light');
+                    card.classList.add('dark');
+                });
+                chartContainers.forEach(chart => {
+                    chart.classList.remove('light');
+                    chart.classList.add('dark');
+                });
+                logs.classList.remove('light');
+                logs.classList.add('dark');
+                processes.classList.remove('light');
+                processes.classList.add('dark');
+            }
+        }
+
         // Error Handling
         [statsWs, logsWs, processWs].forEach(ws => {
             ws.onclose = () => console.log('WebSocket connection closed');
             ws.onerror = (err) => console.error('WebSocket error:', err);
         });
+
+        // Show dashboard by default
+        showSection('dashboard');
     </script>
 </body>
 </html>
