@@ -7,6 +7,7 @@ import (
 	"hexawatch/src/monitor"
 	"hexawatch/src/network"
 	"hexawatch/src/storage"
+	"hexawatch/src/users"
 	"github.com/gorilla/websocket"
 )
 
@@ -25,6 +26,7 @@ func main() {
 	http.HandleFunc("/processes", monitor.ProcessesHandler)
 	http.HandleFunc("/kill", monitor.KillHandler)
 	http.HandleFunc("/disk", diskWebSocketHandler)
+	http.HandleFunc("/users", users.UsersWebSocketHandler)
 	http.HandleFunc("/network", networkWebSocketHandler)
 
 	log.Println("Server starting on :8080...")
@@ -43,7 +45,7 @@ func diskWebSocketHandler(w http.ResponseWriter, r *http.Request) {
 	defer conn.Close()
 
 	for {
-		usage, err := storage.GetDiskUsage("D:\\")
+		usage, err := storage.GetDiskUsage("/")
 		if err != nil {
 			log.Println("Error getting disk usage:", err)
 			return
